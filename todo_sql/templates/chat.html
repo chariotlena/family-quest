@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Семейный чат | Family Quest</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 700px;
+            padding: 40px;
+            animation: slideUp 0.5s ease;
+            display: flex;
+            flex-direction: column;
+            height: 90vh; /* Ограничиваем высоту для чата */
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            font-size: 2.2em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+            margin-bottom: 20px;
+        }
+
+        /* Навигация */
+        .nav-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .back-link {
+            text-decoration: none;
+            color: #764ba2;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: 0.3s;
+        }
+
+        .back-link:hover { transform: translateX(-5px); }
+
+        /* Окно сообщений */
+        .chat-messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            scrollbar-width: thin;
+        }
+
+        .chat-messages::-webkit-scrollbar { width: 6px; }
+        .chat-messages::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+
+        /* Сообщения-пузыри */
+        .message-wrapper {
+            display: flex;
+            flex-direction: column;
+            max-width: 80%;
+        }
+
+        .message-own { align-self: flex-end; }
+        .message-other { align-self: flex-start; }
+
+        .message-info {
+            font-size: 0.75em;
+            color: #718096;
+            margin-bottom: 4px;
+            padding: 0 5px;
+        }
+
+        .bubble {
+            padding: 12px 18px;
+            border-radius: 18px;
+            font-size: 0.95em;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            position: relative;
+        }
+
+        .message-own .bubble {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message-other .bubble {
+            background: #f7fafc;
+            color: #2d3748;
+            border: 1px solid #edf2f7;
+            border-bottom-left-radius: 4px;
+        }
+
+        /* Форма отправки */
+        .chat-form {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 20px;
+            display: flex;
+            gap: 10px;
+            border: 2px solid #edf2f7;
+        }
+
+        .chat-form input {
+            flex-grow: 1;
+            border: none;
+            background: transparent;
+            padding: 10px;
+            font-size: 1em;
+            outline: none;
+        }
+
+        .send-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .send-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        @media (max-width: 600px) {
+            .container { padding: 20px; height: 95vh; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="nav-header">
+        <a href="{% url 'index' %}" class="back-link">⬅ Назад к квестам</a>
+        <div class="user-badge" style="background: #edf2f7; padding: 5px 12px; border-radius: 10px; font-size: 0.8em; font-weight: 600; color: #4a5568;">
+            {{ user.username }}
+        </div>
+    </div>
+
+    <h1>💬 Семейный чат</h1>
+
+    <!-- Список сообщений -->
+    <div class="chat-messages" id="chatBox">
+        {% for msg in messages %}
+            <div class="message-wrapper {% if msg.user == request.user %}message-own{% else %}message-other{% endif %}">
+                <div class="message-info">
+                    <b>{{ msg.user.username }}</b> • {{ msg.created_at|date:"H:i" }}
+                </div>
+                <div class="bubble">
+                    {{ msg.text }}
+                </div>
+            </div>
+        {% empty %}
+            <div style="text-align: center; color: #a0aec0; margin-top: 50px;">
+                Здесь пока тихо... Напишите что-нибудь!
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Форма -->
+    <form class="chat-form" method="POST">
+        {% csrf_token %}
+        <input type="text" name="text" placeholder="Написать сообщение..." required autocomplete="off">
+        <button type="submit" class="send-btn">Отправить</button>
+    </form>
+</div>
+
+<script>
+    // Прокрутка вниз при загрузке
+    const chatBox = document.getElementById('chatBox');
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    // Авто-обновление страницы раз в 60 секунд
+    setTimeout(function(){
+       location.reload();
+    }, 60000);
+</script>
+
+</body>
+</html>

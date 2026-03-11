@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Магазин наград Family Quest</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 900px;
+            padding: 40px;
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            font-size: 2.5em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+            letter-spacing: -1px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .user-balance {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            border: 2px solid rgba(102, 126, 234, 0.2);
+            border-radius: 20px;
+            padding: 24px;
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 1.2em;
+            color: #2d3748;
+        }
+
+        .user-balance span {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+            font-size: 1.3em;
+        }
+
+        /* Messages */
+        .messages {
+            list-style: none;
+            margin-bottom: 30px;
+        }
+
+        .messages li {
+            padding: 16px 20px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .messages .success {
+            background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+            color: white;
+        }
+
+        .messages .error {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            color: white;
+        }
+
+        .messages .warning {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            color: #744210;
+        }
+
+        /* Rewards grid */
+        .rewards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .reward-card {
+            background: white;
+            border-radius: 20px;
+            padding: 28px;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .reward-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .reward-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(102, 126, 234, 0.25);
+            border-color: rgba(102, 126, 234, 0.3);
+        }
+
+        .reward-card h3 {
+            color: #2d3748;
+            font-size: 1.4em;
+            margin-bottom: 12px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .reward-card p {
+            color: #718096;
+            font-size: 0.95em;
+            line-height: 1.6;
+            flex-grow: 1;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .reward-card .cost {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            color: #744210;
+            font-size: 1.3em;
+            font-weight: 800;
+            padding: 12px 20px;
+            border-radius: 14px;
+            text-align: center;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 10px rgba(252, 182, 159, 0.3);
+        }
+
+        .reward-card button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .reward-card button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .reward-card button:disabled {
+            background: linear-gradient(135deg, #cbd5e0 0%, #a0aec0 100%);
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 14px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            max-width: 250px;
+        }
+
+        .back-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #a0aec0;
+            padding: 60px 20px;
+            font-size: 1.2em;
+            grid-column: 1 / -1;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 24px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            .rewards-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🛒 Магазин наград</h1>
+
+    {% if request.user.is_authenticated %}
+        <div class="user-balance">
+            Ваш баланс: <span>{{ user_xp_balance }} XP</span>
+        </div>
+    {% else %}
+        <div class="user-balance">
+            Пожалуйста, авторизуйтесь, чтобы увидеть свой баланс XP и покупать награды.
+        </div>
+    {% endif %}
+
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li class="{{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <div class="rewards-grid">
+        {% for reward in rewards %}
+            <div class="reward-card">
+                <h3>{{ reward.name }}</h3>
+                {% if reward.description %}
+                    <p>{{ reward.description }}</p>
+                {% else %}
+                    <p>Отличная награда!</p>
+                {% endif %}
+                <div class="cost">{{ reward.cost }} XP</div>
+
+                {% if request.user.is_authenticated %}
+                    <form method="post" action="{% url 'purchase_reward' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="reward_id" value="{{ reward.id }}">
+                        <button type="submit" {% if user_xp_balance < reward.cost %}disabled{% endif %}>
+                            {% if user_xp_balance < reward.cost %}
+                                Недостаточно XP
+                            {% else %}
+                                Купить награду
+                            {% endif %}
+                        </button>
+                    </form>
+                {% else %}
+                    <button type="button" disabled>Войдите для покупки</button>
+                {% endif %}
+            </div>
+        {% empty %}
+            <div class="empty-state">
+                🎁 Наград пока нет. Скоро появятся!
+            </div>
+        {% endfor %}
+    </div>
+
+    <a href="{% url 'index' %}" class="back-link">
+        ← Назад к квестам
+    </a>
+
+</div>
+
+</body>
+</html>

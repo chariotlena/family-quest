@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация | Family Quest</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .signup-box {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 450px;
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            text-align: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        p.subtitle { text-align: center; color: #718096; margin-bottom: 30px; font-size: 0.9em; }
+
+        .form-section {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .form-section h4 { color: #4a5568; font-size: 0.8em; margin-bottom: 15px; text-transform: uppercase; }
+
+        form p { margin-bottom: 15px; }
+
+        form label { display: block; margin-bottom: 5px; font-weight: 600; color: #4a5568; font-size: 0.9em; }
+
+        form input {
+            width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #cbd5e0;
+            font-size: 1em; transition: 0.3s;
+        }
+
+        form input:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); }
+
+        .error-msg { color: #f5576c; font-size: 0.8em; margin-top: 5px; list-style: none; }
+
+        button {
+            width: 100%; padding: 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none; border-radius: 12px; font-weight: 700; font-size: 1.1em;
+            cursor: pointer; transition: 0.3s; margin-top: 10px;
+        }
+
+        button:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4); }
+
+        .footer-links { text-align: center; margin-top: 25px; font-size: 0.9em; color: #718096; }
+        .footer-links a { color: #667eea; text-decoration: none; font-weight: 700; }
+
+        .help-text { font-size: 0.75em; color: #a0aec0; margin-top: 4px; display: block; }
+    </style>
+</head>
+<body>
+
+<div class="signup-box">
+    <h2>Регистрация</h2>
+    <p class="subtitle">Добро пожаловать в Family Quest!</p>
+
+    <form method="post">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            <div class="form-section" style="border-color: #feb2b2; background: #fff5f5;">
+                <ul class="error-msg">{% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}</ul>
+            </div>
+        {% endif %}
+
+        <!-- Поля пользователя -->
+        <div class="form-section">
+            <h4>Аккаунт</h4>
+            {% for field in form %}
+                {% if field.name != 'family_name' and field.name != 'invite_code' %}
+                    <p>
+                        <label>{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.help_text %}<span class="help-text">{{ field.help_text }}</span>{% endif %}
+                        {% if field.errors %}<ul class="error-msg">{% for error in field.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
+                    </p>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <!-- Поля Семьи -->
+        <div class="form-section" style="background: #ebf8ff; border-color: #bee3f8;">
+            <h4>Создать или вступить в семью</h4>
+            <p>
+                <label>{{ form.family_name.label }}</label>
+                {{ form.family_name }}
+                <span class="help-text">Если вы первый в семье</span>
+            </p>
+            <div style="text-align: center; margin: 10px 0; color: #a0aec0; font-size: 0.8em;">— ИЛИ —</div>
+            <p>
+                <label>{{ form.invite_code.label }}</label>
+                {{ form.invite_code }}
+                <span class="help-text">Если вам дали код (например: A1B2C3D4)</span>
+            </p>
+        </div>
+
+        <button type="submit">Создать аккаунт</button>
+    </form>
+
+    <div class="footer-links">
+        Уже есть аккаунт? <a href="{% url 'login' %}">Войти</a>
+    </div>
+</div>
+
+</body>
+</html>
