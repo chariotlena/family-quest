@@ -71,16 +71,25 @@ class TaskListView(ListView):
             all_available_tasks = Task.objects.filter(
                 Q(family=user_family) | Q(family__isnull=True)
             )
-
-            completed_task_ids = set(TaskCompletion.objects.filter(
-                user=user,
+            family_completions = TaskCompletion.objects.filter(
+                user__in=family_users,
                 completion_date__date=timezone.now().date()
-            ).values_list('task__id', flat=True))
+            ).select_related('user')
+
+            completed_tasks_map = {tc.task_id: tc.user for tc in family_completions}
 
             tasks_for_display = []
             for task in all_available_tasks:
-                task.is_completed_by_user = task.id in completed_task_ids
-                task.can_be_completed = True
+                completer = completed_tasks_map.get(task.id)
+                if completer:
+                    task.is_completed = True
+                    task.completed_by = completer
+                    task.can_toggle = (completer == user)
+                else:
+                    task.is_completed = False
+                    task.completed_by = None
+                    task.can_toggle = True
+
                 tasks_for_display.append(task)
 
             context['tasks'] = tasks_for_display
@@ -205,7 +214,6 @@ class TaskToggleView(LoginRequiredMixin, View):
     """Отметка квеста выполненным или отмена отметки за сегодня."""
 
     def get(self, request, *args, **kwargs):
-        """Переключает статус выполнения квеста для текущего пользователя на сегодня."""
         family = get_user_family(request.user)
         if family is None:
             messages.error(request, "Вы не состоите в семье.")
@@ -216,19 +224,22 @@ class TaskToggleView(LoginRequiredMixin, View):
             Q(id=kwargs['task_id']) & (Q(family=family) | Q(family__isnull=True))
         )
 
+        family_users = User.objects.filter(profile__family=family)
         today_completion = TaskCompletion.objects.filter(
-            user=request.user,
+            user__in=family_users,
             task=task,
             completion_date__date=timezone.now().date()
         ).first()
 
         if today_completion:
-            today_completion.delete()
-            messages.info(request, f'Отмена: "{task.title}".')
+            if today_completion.user == request.user:
+                today_completion.delete()
+                messages.info(request, f'Отмена: "{task.title}".')
+            else:
+                messages.error(request, f'Эту задачу уже выполнил(а) {today_completion.user.username}. Только он(а) может её отменить.')
         else:
             TaskCompletion.objects.create(user=request.user, task=task, points_earned=task.points)
             messages.success(request, f'Выполнено: "{task.title}"! +{task.points} XP.')
-
         return redirect('index')
 
 

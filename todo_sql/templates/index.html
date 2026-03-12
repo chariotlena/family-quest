@@ -223,15 +223,22 @@
             <li>
                 <span class="xp-badge">+{{ task.points }}</span>
 
-                <a href="{% url 'toggle' task.id %}" class="task-title">
-                    {% if task.is_completed_by_user %}
+                {% if task.can_toggle %}
+                    <a href="{% url 'toggle' task.id %}" class="task-title">
+                        {% if task.is_completed %}
+                            <s>{{ task.title }}</s>
+                            <span>✔️</span>
+                        {% else %}
+                            {{ task.title }}
+                            <span>⏳</span>
+                        {% endif %}
+                    </a>
+                {% else %}
+                    <span class="task-title" style="cursor: not-allowed; opacity: 0.6; display: flex; align-items: center; gap: 8px;">
                         <s>{{ task.title }}</s>
-                        <span>✔️</span>
-                    {% else %}
-                        {{ task.title }}
-                        <span>⏳</span>
-                    {% endif %}
-                </a>
+                        <span>✔️ (Выполнил: <b>{{ task.completed_by.username }}</b>)</span>
+                    </span>
+                {% endif %}
 
                 {% if task.family %}
                     <a href="{% url 'delete' task.id %}" class="delete-btn">🗑️</a>
