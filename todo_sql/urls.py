@@ -1,6 +1,8 @@
 from django.urls import path
 from . import views
 from .views import TaskCreateView, RewardShopView, PurchaseRewardView
+from django.contrib.auth import views as auth_views
+from .forms import RussianLoginForm
 
 
 urlpatterns = [
@@ -12,4 +14,5 @@ urlpatterns = [
     path('rewards/buy/', PurchaseRewardView.as_view(), name='purchase_reward'),
     path('signup/', views.SignUpView.as_view(), name='signup'),
     path('chat/', views.ChatView.as_view(), name='chat'),
+    path('accounts/login/', auth_views.LoginView.as_view(authentication_form=RussianLoginForm), name='login'),
 ]

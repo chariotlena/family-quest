@@ -1,7 +1,15 @@
 from django import forms
-from .models import Task
-from django.contrib.auth.forms import UserCreationForm
-from .models import ChatMessage
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth.models import User
+from .models import Task, ChatMessage
+
+
+class RussianLoginForm(AuthenticationForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['username'].label = 'Имя пользователя'
+        self.fields['password'].label = 'Пароль'
 
 
 class TaskForm(forms.ModelForm):
@@ -47,3 +55,26 @@ class FamilySignUpForm(EmailUserCreationForm):
             )
 
         return cleaned_data
+
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'password1', 'password2']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['username'].label = 'Имя пользователя'
+        self.fields['username'].help_text = 'Не более 150 символов. Буквы, цифры и символы @/./+/-/_'
+
+        self.fields['email'].label = 'Электронная почта'
+
+        self.fields['password1'].label = 'Пароль'
+        self.fields['password1'].help_text = '''
+            Пароль не должен совпадать с личными данными.
+            Минимум 8 символов.
+            Пароль не должен быть слишком простым.
+            Пароль не может состоять только из цифр.
+        '''
+
+        self.fields['password2'].label = 'Подтверждение пароля'
+        self.fields['password2'].help_text = 'Введите пароль ещё раз для проверки.'

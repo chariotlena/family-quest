@@ -24,6 +24,6 @@ admin.site.index_title = "Добро пожаловать, Шеф!"
 
 urlpatterns = [
     path('panel_manager/', admin.site.urls),
-    path('accounts/', include('django.contrib.auth.urls')),
     path('', include('todo_sql.urls')),
+    path('accounts/', include('django.contrib.auth.urls')),
 ]
