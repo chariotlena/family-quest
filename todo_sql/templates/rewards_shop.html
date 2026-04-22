@@ -235,20 +235,20 @@
             grid-column: 1 / -1;
         }
 
-        /* Responsive */
+        /*Адаптация для мобильных устройств*/
         @media (max-width: 768px) {
-            .container {
-                padding: 24px;
-            }
+            body { padding: 10px; }
+            .container { padding: 25px 20px; border-radius: 20px; }
 
-            h1 {
-                font-size: 2em;
-            }
+            h1 { font-size: 1.8em; margin-bottom: 20px; }
+            .user-balance { padding: 15px; font-size: 1.1em; margin-bottom: 25px; }
 
-            .rewards-grid {
-                grid-template-columns: 1fr;
-            }
+            .rewards-grid { grid-template-columns: 1fr; gap: 20px; }
+            .reward-card { padding: 20px; }
+
+            .back-link { width: 100%; max-width: none; justify-content: center; }
         }
+
     </style>
 </head>
 <body>

@@ -153,9 +153,24 @@
             box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
         }
 
+        /*Адаптация для мобильных устройств*/
         @media (max-width: 600px) {
-            .container { padding: 20px; height: 95vh; }
+            body { padding: 10px; height: 100vh; overflow: hidden; }
+            .container { padding: 15px; height: 100%; border-radius: 16px; margin: 0; }
+
+            h1 { font-size: 1.6em; margin-bottom: 10px; }
+
+            .nav-header { margin-bottom: 10px; }
+            .back-link { font-size: 0.9em; }
+
+            .message-wrapper { max-width: 90%; }
+            .bubble { padding: 10px 14px; font-size: 0.9em; }
+
+            .chat-form { padding: 10px; flex-direction: column; border-radius: 16px; gap: 8px; }
+            .chat-form input { padding: 8px; }
+            .send-btn { width: 100%; padding: 12px; }
         }
+
     </style>
 </head>
 <body>

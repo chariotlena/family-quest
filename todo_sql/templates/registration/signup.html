@@ -80,6 +80,35 @@
         .footer-links a { color: #667eea; text-decoration: none; font-weight: 700; }
 
         .help-text { font-size: 0.75em; color: #a0aec0; margin-top: 4px; display: block; }
+
+        /*Адаптация для мобильных устройств*/
+        @media (max-width: 480px) {
+            body { padding: 15px; }
+
+            .container, .login-container, .signup-box {
+                padding: 30px 20px;
+                border-radius: 20px;
+            }
+
+            h2 { font-size: 1.8em; }
+            p.subtitle, p { font-size: 0.9em; }
+
+            form input[type="text"],
+            form input[type="password"],
+            form input[type="email"],
+            form input {
+                padding: 12px;
+                font-size: 16px;
+            }
+
+            button {
+                padding: 14px;
+                font-size: 1em;
+            }
+
+            .form-section { padding: 15px; }
+        }
+
     </style>
 </head>
 <body>
