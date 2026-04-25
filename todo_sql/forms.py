@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.models import User
-from .models import Task, ChatMessage
+from .models import Task, ChatMessage, Reward
 
 
 class RussianLoginForm(AuthenticationForm):
@@ -16,6 +16,12 @@ class TaskForm(forms.ModelForm):
     class Meta:
         model = Task
         fields = ['title', 'points']
+
+
+class RewardForm(forms.ModelForm):
+    class Meta:
+        model = Reward
+        fields =['name', 'description', 'cost']
 
 
 class EmailUserCreationForm(UserCreationForm):

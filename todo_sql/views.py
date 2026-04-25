@@ -1,9 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Task, Reward, Transaction, TaskCompletion, Family, ChatMessage
-from .forms import TaskForm, FamilySignUpForm, ChatMessageForm
+from .forms import TaskForm, FamilySignUpForm, ChatMessageForm, RewardForm
 from django.contrib.auth.models import User
 from django.db.models import Sum, Q
-from django.views.generic import ListView, CreateView, DeleteView, View
+from django.views.generic import ListView, CreateView, DeleteView, View, UpdateView
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -133,6 +133,7 @@ class RewardShopView(ListView):
             user_xp_balance = total_earned_xp - total_spent_xp
 
         context['user_xp_balance'] = user_xp_balance
+        context['form'] = RewardForm()
         return context
 
 
@@ -163,6 +164,75 @@ class PurchaseRewardView(LoginRequiredMixin, View):
         return redirect('rewards_shop')
 
 
+class RewardCreateView(LoginRequiredMixin, View):
+    """Создание новой награды для семьи текущего пользователя."""
+
+    def post(self, request, *args, **kwargs):
+        """Валидирует форму и сохраняет награду, привязав его к семье пользователя."""
+        form = RewardForm(request.POST)
+        if form.is_valid():
+            if hasattr(request.user, 'profile') and request.user.profile.family:
+                new_reward = form.save(commit=False)
+                new_reward.family = request.user.profile.family
+                new_reward.is_active = True
+                new_reward.save()
+                messages.success(request, f"Награда «{new_reward.name}» добавлена!")
+            else:
+                messages.error(request, "Вы не состоите в семье, чтобы создавать награды.")
+        else:
+            messages.error(request, "Ошибка: проверьте правильность введенных данных.")
+        return redirect('rewards_shop')
+
+    def get(self, request, *args, **kwargs):
+        """Редиректит на страницу магазина наград при прямом переходе по URL."""
+        return redirect('rewards_shop')
+
+
+class RewardUpdateView(LoginRequiredMixin, UpdateView):
+    """Редактирование награды"""
+    model = Reward
+    form_class = RewardForm
+    template_name = 'reward_edit.html'
+    success_url = reverse_lazy('rewards_shop')
+    pk_url_kwarg = 'reward_id'
+
+    def get_queryset(self):
+        """Ограничивает выборку наград только своей семьи."""
+        family = get_user_family(self.request.user)
+        if family is None:
+            return self.model.objects.none()
+        return self.model.objects.filter(family=family)
+
+    def form_valid(self, form):
+        """Добавляем сообщение об успешном сохранении."""
+        messages.success(self.request, f"Награда «{form.instance.name}» успешно обновлена!")
+        return super().form_valid(form)
+
+
+class RewardDeleteView(LoginRequiredMixin, DeleteView):
+    """Удаление награды. Доступно только членам семьи, которой принадлежит награда."""
+    model = Reward
+    success_url = reverse_lazy('rewards_shop')
+    pk_url_kwarg = 'reward_id'
+
+    def get_queryset(self):
+        """Ограничивает выборку наград только своей семьи."""
+        family = get_user_family(self.request.user)
+        if family is None:
+            return self.model.objects.none()
+        return self.model.objects.filter(family=family)
+
+    def get(self, request, *args, **kwargs):
+        """Удаляет награду при GET-запросе (переход по ссылке удаления)."""
+        messages.warning(request, "Награда удалена.")
+        return self.delete(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        """Удаляет награду при POST-запросе (отправка формы)."""
+        messages.warning(request, "Награда удалена.")
+        return self.delete(request, *args, **kwargs)
+
+
 class TaskCreateView(LoginRequiredMixin, View):
     """Создание нового квеста для семьи текущего пользователя."""
 
@@ -184,6 +254,27 @@ class TaskCreateView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         """Редиректит на главную при прямом переходе по URL."""
         return redirect('index')
+
+
+class TaskUpdateView(LoginRequiredMixin, UpdateView):
+    """Редактирование квеста"""
+    model = Task
+    form_class = TaskForm
+    template_name = 'task_edit.html'
+    success_url = reverse_lazy('index')
+    pk_url_kwarg = 'task_id'
+
+    def get_queryset(self):
+        """Ограничивает выборку задачами только своей семьи."""
+        family = get_user_family(self.request.user)
+        if family is None:
+            return self.model.objects.none()
+        return self.model.objects.filter(family=family)
+
+    def form_valid(self, form):
+        """Добавляем сообщение об успешном сохранении."""
+        messages.success(self.request, f"Квест «{form.instance.title}» успешно обновлён!")
+        return super().form_valid(form)
 
 
 class TaskDeleteView(LoginRequiredMixin, DeleteView):

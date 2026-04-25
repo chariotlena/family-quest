@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Family Quest{% endblock %}</title>
+
+    <!-- 1. ИКОНКИ ДЛЯ ВКЛАДОК И АДРЕСНОЙ СТРОКИ НА ПК -->
+    <link rel="icon" href="{% static 'images/icons/favicon.ico' %}" sizes="any">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/icons/favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/icons/favicon-16x16.png' %}">
+
+    <!-- 2. ИКОНКИ ДЛЯ ТЕЛЕФОНОВ (Ярлык на экран) -->
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'images/icons/apple-touch-icon.png' %}">
+    <link rel="icon" type="image/png" sizes="192x192" href="{% static 'images/icons/favicon-192x192.png' %}">
+    <link rel="icon" type="image/png" sizes="512x512" href="{% static 'images/icons/favicon-512x512.png' %}">
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+
+    <!-- Цвет верхней панели браузера (Android/Chrome) -->
+    <meta name="theme-color" content="#764ba2">
+
+    <!-- 3. OPEN GRAPH (Красивые превью в Telegram, WhatsApp, VK) -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Family Quest — Семейные квесты">
+    <meta property="og:description" content="Выполняйте задания, получайте XP и забирайте награды вместе с семьей!">
+    <meta property="og:image" content="{% static 'images/icons/og-image.jpg' %}">
+    <meta property="og:site_name" content="Family Quest">
+
+    <style>
+        /* Самая база, которая 100% одинаковая везде */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            /* align-items убрали отсюда, каждая страница задаст его сама! */
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+
+    <!-- Сюда страницы будут вставлять свои уникальные стили -->
+    {% block extra_styles %}{% endblock %}
+</head>
+<body>
+    <!-- Сюда страницы будут вставлять свой HTML -->
+    {% block content %}{% endblock %}
+</body>
+</html>
